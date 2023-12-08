@@ -2,15 +2,19 @@ package org.example.page;
 
 import org.example.driver.ChromeDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
 public class CatalogPO {
     private final String url = "https://catalog.onliner.by/";
+    private final WebDriver driver = ChromeDriver.getInstance();
+    private final WebDriverWait driverWait = ChromeDriver.getWaitInstance();
     @FindBy(xpath = "//li[@data-id=\"1\"]")
     private WebElement electronics;
     @FindBy(xpath = "//li[@data-id=\"2\"]")
@@ -29,6 +33,8 @@ public class CatalogPO {
     private WebElement children;
     @FindBy(xpath = "//li[@data-id=\"9\"]")
     private WebElement everyday;
+    @FindBy(xpath = "//li[@data-id=\"12\"]")
+    private WebElement prime;
 
     public CatalogPO(){
         PageFactory.initElements(ChromeDriver.getInstance(), this);
@@ -39,8 +45,8 @@ public class CatalogPO {
     }
 
     public void openPage(){
-        ChromeDriver.getInstance().get(url);
-        ChromeDriver.getInstance().manage().window().maximize();
+        driver.get(url);
+        driver.manage().window().maximize();
     }
 
     public WebElement getElectronics() {
@@ -79,19 +85,19 @@ public class CatalogPO {
         return everyday;
     }
 
-    public List<WebElement> getDependentList(String xpath){
-        return ChromeDriver.getInstance().findElements(By.xpath(xpath));
+    public WebElement getPrime() {
+        return prime;
     }
 
     public void passScenario(WebElement element){
-        ChromeDriver.getWaitInstance().until(ExpectedConditions.elementToBeClickable(element));
+        driverWait.until(ExpectedConditions.elementToBeClickable(element));
         element.click();
 
-        getDependentList(String.format("//div[@data-id=\"%s\"]//div[@class=\"catalog-navigation-list__aside-item\"]", element.getAttribute("data-id"))
+        driver.findElements(By.xpath(String.format("//div[@data-id=\"%s\"]//div[@class=\"catalog-navigation-list__aside-item\"]", element.getAttribute("data-id")))
         ).stream().forEach(webElement -> {
-            ChromeDriver.getWaitInstance().until(ExpectedConditions.elementToBeClickable(webElement));
+            driverWait.until(ExpectedConditions.elementToBeClickable(webElement));
             webElement.click();
-            getDependentList("//div[@class=\"catalog-navigation-list__aside-item catalog-navigation-list__aside-item_active\"]//a/span/span[@class!=\"catalog-navigation-list__dropdown-preview\"]")
+            driver.findElements(By.xpath("//div[@class=\"catalog-navigation-list__aside-item catalog-navigation-list__aside-item_active\"]//a/span/span[@class!=\"catalog-navigation-list__dropdown-preview\"]"))
                     .stream().forEach(webElement1 -> {
                         System.out.println(webElement1.getText());
 
