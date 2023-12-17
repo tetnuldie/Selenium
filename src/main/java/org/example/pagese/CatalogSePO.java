@@ -1,6 +1,7 @@
 package org.example.pagese;
 
 import com.codeborne.selenide.*;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,12 +25,21 @@ public class CatalogSePO {
         menuElementsMap.put("Prime", "12");
     }
 
-    public void openPage(){
+    public void openPageWeb(){
         open("https://catalog.onliner.by/");
         webdriver().driver().getWebDriver().manage().window().maximize();
- //       webdriver().driver().getWebDriver().manage().window().setSize(new Dimension(436, 913));
-
     }
+
+    public void openPageMobile(){
+        Configuration.browser = "chrome";
+        ChromeOptions options = new ChromeOptions();
+        Map<String, Object> mobileProperties = new HashMap<>();
+        mobileProperties.put("deviceName", "iPhone 12 Pro");
+        options.setExperimentalOption("mobileEmulation", mobileProperties);
+        Configuration.browserCapabilities = options;
+        open("https://catalog.onliner.by/");
+    }
+
 
     public SelenideElement getMenuElement(String name) {
         return $x(String.format("//li[@data-id='%s']", menuElementsMap.get(name))).shouldBe(Condition.visible);

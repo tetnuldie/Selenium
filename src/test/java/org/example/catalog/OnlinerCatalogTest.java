@@ -22,7 +22,8 @@ public class OnlinerCatalogTest {
 
     @Test(dataProvider = "elementsListProvider")
     public void allMenuElementPresent(List<String> elementNames) {
-        page.openPage();
+  //      page.openPageWeb();
+        page.openPageMobile();
         SoftAssert softAssert = new SoftAssert();
         elementNames.forEach(element -> {
             try {
@@ -38,7 +39,7 @@ public class OnlinerCatalogTest {
     @Test(dataProvider = "categoryNameProvider")
     public void computersItemSideMenuPresent(String elementName, List<String> categoriesList) {
         SoftAssert softAssert = new SoftAssert();
-        page.openPage();
+        page.openPageWeb();
         page.getMenuElement(elementName).click();
 
         categoriesList.forEach(element -> {
@@ -52,7 +53,7 @@ public class OnlinerCatalogTest {
     @Test(dataProvider = "productCategoryNameProvider")
     public void computersProductListInfoPresent(String elementName, List<String> categoriesList) {
         SoftAssert softAssert = new SoftAssert();
-        page.openPage();
+        page.openPageWeb();
 
         page.getMenuElement(elementName).click();
         categoriesList.forEach(element -> {
