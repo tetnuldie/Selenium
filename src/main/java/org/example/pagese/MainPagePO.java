@@ -12,13 +12,8 @@ public class MainPagePO {
         System.setProperty("webdriver.chrome.driver", "src/chromedriver.exe");
     }
 
-
-    public ElementsCollection getHeadMenuElementsWithExpand() {
-        return $$x("//li[@class='b-main-navigation__item b-main-navigation__item_arrow']");
-    }
-
     public SelenideElement getHeadMenuElementsWithExpandByName(String name) {
-        return getHeadMenuElementsWithExpand()
+        return $$x("//li[@class='b-main-navigation__item b-main-navigation__item_arrow']")
                 .filterBy(Condition.text(name))
                 .first()
                 .shouldBe(Condition.visible);
