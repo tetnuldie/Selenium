@@ -18,7 +18,7 @@ public class StepsDefinitions {
     MainPagePO page = new MainPagePO();
 
     @BeforeAll
-    public static void before_all(){
+    public static void beforeAll(){
         Configuration.startMaximized = true;
     }
 
@@ -54,7 +54,7 @@ public class StepsDefinitions {
     }
 
     @AfterAll
-    public static void after_all(){
+    public static void afterAll(){
         webdriver().driver().getWebDriver().quit();
     }
 }
