@@ -11,6 +11,8 @@ import org.example.pagese.MainPagePO;
 import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 
+import java.util.List;
+
 import static com.codeborne.selenide.Selenide.webdriver;
 
 public class StepsDefinitions {
@@ -42,14 +44,12 @@ public class StepsDefinitions {
         Assert.assertTrue(page.getSectionItemByName(parentName, itemName).isDisplayed(), "Section Item "+itemName+" not found");
     }
 
-    @And("dependent sections of {string} menu are shown")
-    public void subMenuCategoryColumnIsShown(String name){
+    @And("dependent sections of {string} menu are shown:")
+    public void subMenuCategoryColumnIsShown(String name, List<String> stringList){
         SoftAssert softAssert = new SoftAssert();
-        page.getSectionNavColumns(name).forEach(element -> {
-            softAssert.assertTrue(element.isDisplayed(), "Element "+element.getSearchCriteria()+" Not located");
-            softAssert.assertNotNull(element.getText(), "Element "+element.getSearchCriteria()+" Text is missing");
+        stringList.stream().forEach(element -> {
+            softAssert.assertTrue(page.isElementDisplayedAsPartOfSelectionNavColumns(name, element), "Element "+element+" not found as part of "+name+" menu");
         });
-
         softAssert.assertAll();
     }
 

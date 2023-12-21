@@ -31,6 +31,13 @@ public class MainPagePO {
                 .$$x(".//div[@class='b-main-navigation__dropdown-column']");
     }
 
+    public boolean isElementDisplayedAsPartOfSelectionNavColumns(String sectionName, String fieldName){
+        return getSectionNavColumns(sectionName)
+                .filter(Condition.matchText(fieldName))
+                .first()
+                .isDisplayed();
+    }
+
 
     public SelenideElement getSectionItemByName(String sectionName, String name){
         return getDropdownSection(sectionName)

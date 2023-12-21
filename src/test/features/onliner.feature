@@ -12,4 +12,19 @@ Feature: Onliner Main Page
     Given main page is opened
     When user move mouse to the "Дома и квартиры" menu item
     Then sub menu "Продажа" is opened
-    And dependent sections of "Продажа" menu are shown
+    And dependent sections of "Продажа" menu are shown:
+      | Минск   |
+      | Брест   |
+      | Гомель  |
+      | Витебск |
+      | Гродно  |
+      | Могилев |
+    And dependent sections of "Продажа" menu are shown:
+      | 1-комнатные  |
+      | 2-комнатные  |
+      | 3-комнатные  |
+      | 4+-комнатные |
+    And dependent sections of "Продажа" menu are shown:
+      | До 30 000 $     |
+      | 30 000–80 000 $ |
+      | От 80 000 $     |
