@@ -14,6 +14,7 @@ public class ChromeDriver {
     }
 
     public static WebDriver getInstance(){
+        instance.manage().window().maximize();
         return instance;
     }
 

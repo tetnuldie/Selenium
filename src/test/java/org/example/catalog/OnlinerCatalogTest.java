@@ -1,15 +1,16 @@
 package org.example.catalog;
 
 import com.codeborne.selenide.Condition;
+import com.codeborne.selenide.ex.ElementNotFound;
 import org.example.OnlinerTvListener;
 import org.example.pagese.CatalogSePO;
-import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import org.testng.asserts.SoftAssert;
 
-import static com.codeborne.selenide.Selenide.$$x;
+import java.util.ArrayList;
+import java.util.List;
 
 @Listeners(OnlinerTvListener.class)
 public class OnlinerCatalogTest {
@@ -19,72 +20,90 @@ public class OnlinerCatalogTest {
 
     private CatalogSePO page = new CatalogSePO();
 
-    @Test
-    public void allMenuElementPresent() {
-        page.openPage();
-        page.getElectronics().shouldBe(Condition.visible);
-        page.getAuto().shouldBe(Condition.visible);
-        page.getAgd().shouldBe(Condition.visible);
-        page.getBeauty().shouldBe(Condition.visible);
-        page.getBuilding().shouldBe(Condition.visible);
-        page.getChildren().shouldBe(Condition.visible);
-        page.getComputers().shouldBe(Condition.visible);
-        page.getHousehold().shouldBe(Condition.visible);
-        page.getEveryday().shouldBe(Condition.visible);
-        page.getPrime().shouldBe(Condition.visible);
-    }
-
-    @Test(dataProvider = "categoryNameProvider")
-    public void computersItemSideMenuPresent(String categoryName) {
-        page.openPage();
-        page.getComputers().shouldBe(Condition.visible).click();
-        Assert.assertEquals(1, page.getElementMenuList(page.getComputers()).filterBy(Condition.text(categoryName)).size(),
-                "Section - "+ categoryName + "is absent");
-    }
-
-    @Test(dataProvider = "productCategoryNameProvider")
-    public void computersProductListInfoPresent(String categoryName) {
+    @Test(dataProvider = "elementsListProvider")
+    public void allMenuElementPresent(List<String> elementNames) {
+  //      page.openPageWeb();
+        page.openPageMobile();
         SoftAssert softAssert = new SoftAssert();
-        page.openPage();
-        page.getComputers().shouldBe(Condition.visible).click();
-        var menuOption = page.getElementMenuList(page.getComputers())
-                .filterBy(Condition.text(categoryName))
-                .get(0).shouldBe(Condition.visible);
-
-        menuOption.click();
-
-        $$x("//div[@class=\"catalog-navigation-list__aside-item catalog-navigation-list__aside-item_active\"]//a/span")
-                .stream().forEach(element -> {
-                    softAssert.assertNotNull(
-                            element
-                                    .$x("./span[@class=\"catalog-navigation-list__dropdown-title\"]")
-                                    .getText(),"Title is missing for element: " + element.getSearchCriteria()
-                    );
-                    softAssert.assertNotNull(
-                            element
-                                    .$x("./span[@class=\"catalog-navigation-list__dropdown-description\"]")
-                                    .getText(), "Description is missing for element: "+ element.getSearchCriteria()
-                    );
-                });
+        elementNames.forEach(element -> {
+            try {
+                softAssert.assertNotNull(page.getMenuElement(element));
+            } catch (ElementNotFound e) {
+                softAssert.fail("Element Not Fount by name " + element);
+            }
+        });
 
         softAssert.assertAll();
     }
 
-    @DataProvider(name = "categoryNameProvider")
-    public Object[] categoryNameProvider() {
+    @Test(dataProvider = "categoryNameProvider")
+    public void computersItemSideMenuPresent(String elementName, List<String> categoriesList) {
+        SoftAssert softAssert = new SoftAssert();
+        page.openPageWeb();
+        page.getMenuElement(elementName).click();
+
+        categoriesList.forEach(element -> {
+            softAssert.assertEquals(1, page.getElementMenuList(page.getMenuElement(elementName)).filterBy(Condition.text(element)).size(),
+                    "Section - " + element + "is absent");
+        });
+
+        softAssert.assertAll();
+    }
+
+    @Test(dataProvider = "productCategoryNameProvider")
+    public void computersProductListInfoPresent(String elementName, List<String> categoriesList) {
+        SoftAssert softAssert = new SoftAssert();
+        page.openPageWeb();
+
+        page.getMenuElement(elementName).click();
+        categoriesList.forEach(element -> {
+            page.getElementElementMenuItemByName(page.getMenuElement(elementName), element)
+                    .click();
+            page.getElementCategoryItems().forEach(element1 -> {
+                System.out.println(element1.getText());
+                softAssert.assertNotNull(page.getCategoryItemName(element1), "Title is missing for element: " + element1.getSearchCriteria());
+                softAssert.assertNotNull(page.getCategoryItemDescription(element1), "Description is missing for element: " + element1.getSearchCriteria());
+            });
+        });
+        softAssert.assertAll();
+    }
+
+    @DataProvider(name = "elementsListProvider")
+    public Object[] elementsListProvider() {
+        List<String> elementNamesList = new ArrayList<>();
+        elementNamesList.add("Электроника");
+        elementNamesList.add("Компьютеры и сети");
+        elementNamesList.add("Бытовая техника");
+        elementNamesList.add("Стройка и ремонт");
+        elementNamesList.add("Дом и сад");
+        elementNamesList.add("Авто и мото");
+        elementNamesList.add("Красота и спорт");
+        elementNamesList.add("Детям и мамам");
+        elementNamesList.add("Работа и офис");
+        elementNamesList.add("Еда");
         return new Object[]{
-                "Ноутбуки, компьютеры, мониторы",
-                "Комплектующие",
-                "Хранение данных",
-                "Сетевое оборудование"
+                elementNamesList
+        };
+    }
+    @DataProvider(name = "categoryNameProvider")
+    public Object[][] categoryNameProvider() {
+        List<String> categoriesList = new ArrayList<>();
+        categoriesList.add("Ноутбуки, компьютеры, мониторы");
+        categoriesList.add("Комплектующие");
+        categoriesList.add("Хранение данных");
+        categoriesList.add("Сетевое оборудование");
+        return new Object[][]{
+                {"Компьютеры и сети", categoriesList}
         };
     }
 
     @DataProvider(name = "productCategoryNameProvider")
-    public Object[] productCategoryNameProvider(){
-        return new Object[]{
-                "Комплектующие",
-                "Хранение данных"
+    public Object[][] productCategoryNameProvider() {
+        List<String> categoriesList = new ArrayList<>();
+        categoriesList.add("Комплектующие");
+        categoriesList.add("Хранение данных");
+        return new Object[][]{
+                {"Компьютеры и сети", categoriesList}
         };
     }
 }

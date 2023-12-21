@@ -1,63 +1,70 @@
 package org.example.pagese;
 
-import com.codeborne.selenide.ElementsCollection;
-import com.codeborne.selenide.Selenide;
-import com.codeborne.selenide.SelenideDriver;
-import com.codeborne.selenide.SelenideElement;
-import org.openqa.selenium.Dimension;
+import com.codeborne.selenide.*;
+import org.openqa.selenium.chrome.ChromeOptions;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.codeborne.selenide.Selenide.*;
 
 public class CatalogSePO {
-    public SelenideElement getElectronics() {
-        return $x("//li[@data-id=\"1\"]");
+    private Map<String, String> menuElementsMap;
+    public CatalogSePO(){
+
+        menuElementsMap = new HashMap<>();
+        menuElementsMap.put("Электроника", "1");
+        menuElementsMap.put("Компьютеры и сети", "2");
+        menuElementsMap.put("Бытовая техника", "3");
+        menuElementsMap.put("Стройка и ремонт", "4");
+        menuElementsMap.put("Дом и сад", "5");
+        menuElementsMap.put("Авто и мото", "6");
+        menuElementsMap.put("Красота и спорт", "7");
+        menuElementsMap.put("Детям и мамам", "8");
+        menuElementsMap.put("Everyday", "9");
+        menuElementsMap.put("Prime", "12");
     }
 
-    public SelenideElement getComputers() {
-        return $x("//li[@data-id=\"2\"]");
-    }
-
-    public SelenideElement getAgd() {
-        return $x("//li[@data-id=\"3\"]");
-    }
-
-    public SelenideElement getBuilding() {
-        return $x("//li[@data-id=\"4\"]");
-    }
-
-    public SelenideElement getHousehold() {
-        return $x("//li[@data-id=\"5\"]");
-    }
-
-    public SelenideElement getAuto() {
-        return $x("//li[@data-id=\"6\"]");
-    }
-
-    public SelenideElement getBeauty() {
-        return $x("//li[@data-id=\"7\"]");
-    }
-
-    public SelenideElement getChildren() {
-        return $x("//li[@data-id=\"8\"]");
-    }
-
-    public SelenideElement getEveryday() {
-        return $x("//li[@data-id=\"9\"]");
-    }
-
-    public SelenideElement getPrime() {
-        return $x("//li[@data-id=\"12\"]");
-    }
-
-    public void openPage(){
+    public void openPageWeb(){
         open("https://catalog.onliner.by/");
- //       webdriver().driver().getWebDriver().manage().window().maximize();
-        webdriver().driver().getWebDriver().manage().window().setSize(new Dimension(436, 913));
+        webdriver().driver().getWebDriver().manage().window().maximize();
+    }
 
+    public void openPageMobile(){
+        Configuration.browser = "chrome";
+        ChromeOptions options = new ChromeOptions();
+        Map<String, Object> mobileProperties = new HashMap<>();
+        mobileProperties.put("deviceName", "iPhone 12 Pro");
+        options.setExperimentalOption("mobileEmulation", mobileProperties);
+        Configuration.browserCapabilities = options;
+        open("https://catalog.onliner.by/");
+    }
+
+
+    public SelenideElement getMenuElement(String name) {
+        return $x(String.format("//li[@data-id='%s']", menuElementsMap.get(name))).shouldBe(Condition.visible);
     }
 
     public ElementsCollection getElementMenuList(SelenideElement element){
         return $$x(String.format("//div[@data-id=\"%s\"]//div[@class=\"catalog-navigation-list__aside-item\"]", element.getAttribute("data-id")));
+    }
+
+    public SelenideElement getElementElementMenuItemByName(SelenideElement element, String name){
+        return getElementMenuList(element)
+                .filterBy(Condition.text(name))
+                .get(0).shouldBe(Condition.visible);
+    }
+
+    public ElementsCollection getElementCategoryItems(){
+        return $$x("//div[@class=\"catalog-navigation-list__aside-item catalog-navigation-list__aside-item_active\"]//a/span");
+    }
+
+    public SelenideElement getCategoryItemName(SelenideElement element){
+        return element.$x("./span[@class=\"catalog-navigation-list__dropdown-title\"]").shouldBe(Condition.visible);
+    }
+
+    public SelenideElement getCategoryItemDescription(SelenideElement element){
+        return element.$x("./span[@class=\"catalog-navigation-list__dropdown-description\"]").shouldBe(Condition.visible);
     }
 
 
